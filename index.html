@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>www.slbotbee.com</title>
+    <style>
+        body { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; background-color: #ffeef8; font-family: 'Arial', sans-serif; 
+        }
+        h1 { color: #d63384; font-size: 3rem; text-align: center; }
+        .buttons { margin-top: 20px; }
+        button { 
+            padding: 15px 30px; font-size: 1.2rem; cursor: pointer; 
+            border-radius: 10px; border: none; margin: 0 10px; transition: 0.3s;
+        }
+        #yesBtn { background-color: #ff4d6d; color: white; }
+        #noBtn { background-color: #555; color: white; }
+        #yesBtn:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body>
+
+    <h1>Do you love me? ❤️</h1>
+    
+    <div class="buttons">
+        <button id="yesBtn">Yes</button>
+        <button id="noBtn">No</button>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+         const noBtn = document.getElementById('yesBtn');
+        
+        // This moves the button when the mouse touches it
+        yesBtn.addEventListener('mouseover', () => {
+            const x = Math.floor(Math.random() * (window.innerWidth - 100));
+            const y = Math.floor(Math.random() * (window.innerHeight - 100));
+            yesBtn.style.left = x + 'px';
+            yesBtn.style.top = y + 'px';
+        });
+        // Redirects to the RANNGO parody video: https://www.youtube.com/watch?v=7-zUivzSFSU
+        noBtn.onclick = () => {
+            window.location.href = "https://www.youtube.com/watch?v=7-zUivzSFSU";
+        };
+    </script>
+</body>
+</html>
