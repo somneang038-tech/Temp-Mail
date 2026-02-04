@@ -2,48 +2,122 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>www.slbotbee.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Temp Mail 2026</title>
     <style>
-        body { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            height: 100vh; background-color: #ffeef8; font-family: 'Arial', sans-serif; 
-        }
-        h1 { color: #d63384; font-size: 3rem; text-align: center; }
-        .buttons { margin-top: 20px; }
-        button { 
-            padding: 15px 30px; font-size: 1.2rem; cursor: pointer; 
-            border-radius: 10px; border: none; margin: 0 10px; transition: 0.3s;
-        }
-        #yesBtn { background-color: #ff4d6d; color: white; }
-        #noBtn { background-color: #555; color: white; }
-        #yesBtn:hover { transform: scale(1.1); }
+        :root { --accent: #00d2ff; --bg: #0f172a; --card: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; padding: 20px; }
+        .container { width: 100%; max-width: 500px; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 50px rgba(0,0,0,0.3); }
+        .status-bar { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); margin-bottom: 10px; }
+        .mail-area { background: #334155; padding: 15px; border-radius: 12px; display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #475569; }
+        input { background: transparent; border: none; color: white; flex: 1; font-size: 1.1rem; font-weight: 600; outline: none; }
+        button { background: var(--accent); color: #000; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,210,255,0.4); }
+        .inbox { margin-top: 30px; border-top: 1px solid #475569; padding-top: 20px; }
+        .msg { background: #334155; padding: 15px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; border-left: 4px solid var(--accent); }
+        .msg:hover { background: #475569; }
+        .msg-sub { font-weight: bold; display: block; }
+        .msg-from { font-size: 0.8rem; color: #94a3b8; }
     </style>
 </head>
 <body>
 
-    <h1>Do you love me? ❤️</h1>
+<div class="container">
+    <div id="status" class="status-bar">System Ready</div>
+    <h2>Temp Mail by Neang</h2>
     
-    <div class="buttons">
-        <button id="yesBtn">Yes</button>
-        <button id="noBtn">No</button>
+    <div class="mail-area">
+        <input type="text" id="address" readonly value="Creating account...">
+        <span style="cursor:pointer" onclick="copyMail()">គប់២</span>
     </div>
 
-    <script>
-        const yesBtn = document.getElementById('yesBtn');
-        const noBtn = document.getElementById('noBtn');
-         const noBtn = document.getElementById('yesBtn');
+    <button onclick="startFresh()">Get New Identity</button>
+
+    <div class="inbox">
+        <div id="msgList">Waiting for incoming codes...</div>
+    </div>
+</div>
+
+<script>
+    let token = "";
+    const API = "https://api.mail.tm";
+
+    async function startFresh() {
+        document.getElementById('status').innerText = "កំពុងដំឡើង..";
+        document.getElementById('msgList').innerHTML = "កំពុងដំណើរការមួយទៀត..";
         
-        // This moves the button when the mouse touches it
-        yesBtn.addEventListener('mouseover', () => {
-            const x = Math.floor(Math.random() * (window.innerWidth - 100));
-            const y = Math.floor(Math.random() * (window.innerHeight - 100));
-            yesBtn.style.left = x + 'px';
-            yesBtn.style.top = y + 'px';
-        });
-        // Redirects to the RANNGO parody video: https://www.youtube.com/watch?v=7-zUivzSFSU
-        noBtn.onclick = () => {
-            window.location.href = "https://www.youtube.com/watch?v=7-zUivzSFSU";
-        };
-    </script>
+        try {
+            // 1. Get Domain
+            const domains = await fetch(`${API}/domains`).then(r => r.json());
+            const domain = domains["hydra:member"][0].domain;
+
+            // 2. Create Account
+            const email = `${Math.random().toString(36).substring(2, 12)}@${domain}`;
+            const password = "Neang123";
+            
+            await fetch(`${API}/accounts`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({address: email, password: password})
+            });
+
+            // 3. Get Token
+            const auth = await fetch(`${API}/token`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({address: email, password: password})
+            }).then(r => r.json());
+
+            token = auth.token;
+            document.getElementById('address').value = email;
+            document.getElementById('status').innerText = "កំពុងដំណើរការហើយ..";
+            document.getElementById('msgList').innerHTML = "មិនមានកូដផ្ញើមកទេ..";
+            
+            // Start listening
+            pollInbox();
+        } catch (e) {
+            document.getElementById('status').innerText = "Error: Site Blocked API";
+        }
+    }
+
+    async function pollInbox() {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API}/messages`, {
+                headers: {'Authorization': `Bearer ${token}`}
+            }).then(r => r.json());
+
+            const msgs = res["hydra:member"];
+            if (msgs.length > 0) {
+                const list = document.getElementById('msgList');
+                list.innerHTML = "";
+                msgs.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'msg';
+                    div.innerHTML = `<span class="msg-sub">${m.subject}</span><span class="msg-from">${m.intro}</span>`;
+                    div.onclick = () => viewMessage(m.id);
+                    list.appendChild(div);
+                });
+            }
+        } catch (e) {}
+        setTimeout(pollInbox, 5000);
+    }
+
+    async function viewMessage(id) {
+        const res = await fetch(`${API}/messages/${id}`, {
+            headers: {'Authorization': `Bearer ${token}`}
+        }).then(r => r.json());
+        alert(`CODE / MESSAGE:\n\n${res.text}`);
+    }
+
+    function copyMail() {
+        const copyText = document.getElementById("address");
+        copyText.select();
+        navigator.clipboard.writeText(copyText.value);
+        document.getElementById('status').innerText = "Copied to Clipboard!";
+    }
+
+    startFresh();
+</script>
 </body>
 </html>
